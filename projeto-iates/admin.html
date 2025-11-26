@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Luxo - Admin</title>
+
+  <link rel="shortcut icon" href="images/barco2.png" type="image/x-icon" />
+  <link rel="stylesheet" href="css/default.css" />
+</head>
+
+<body>
+  <div class="page">
+
+    <header>
+      <div id="title">
+        <img src="images/barco1.png" alt="ícone de barco" />
+        <div class="headtitle">
+          <h1>Luxo</h1>
+          <h2>Aluguel de iates</h2>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <div class="pagtitle">
+        <div class="bgtitle"></div>
+        <h2>Área Administrativa</h2>
+      </div>
+
+      <form id="form-login" class="login-form">
+        <div class="entry">
+          <label for="email">E-mail</label>
+          <input type="email" id="email" required />
+        </div>
+
+        <div class="entry">
+          <label for="senha">Senha</label>
+          <input type="password" id="senha" required />
+        </div>
+
+        <div class="buttons">
+          <button type="submit" class="button">Entrar</button>
+        </div>
+
+        <p id="msg-erro" style="color:red; margin-top:15px;"></p>
+      </form>
+    </main>
+
+  </div>
+
+  <footer>
+    <p>© 2023 por Luxo aluguel de iates</p>
+  </footer>
+
+  <!-- scripts obrigatórios -->
+  <script src="js/jquery-3.6.4.min.js"></script>
+  <script src="js/api.js"></script>
+
+  <script>
+    document.getElementById("form-login").addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const email = document.getElementById("email").value;
+      const senha = document.getElementById("senha").value;
+
+      const objLoginSenha = {
+        email: email,
+        senha: senha
+      };
+
+      const valido = validarUsuario(objLoginSenha);
+
+      if (valido) {
+        window.location.href = "mensagens.html";
+      } else {
+        document.getElementById("msg-erro").innerText = "E-mail e Senha inválidos";
+      }
+    });
+  </script>
+
+</body>
+</html>

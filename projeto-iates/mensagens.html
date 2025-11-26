@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Luxo - Mensagens</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+  <link rel="shortcut icon" href="images/barco2.png" type="image/x-icon" />
+  <link rel="stylesheet" href="css/default.css" />
+
+  <style>
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      border: 1px solid #999;
+      padding: 8px;
+    }
+
+    th {
+      background: #000;
+      color: #fff;
+      text-align: left;
+    }
+
+    .nao-visualizada td {
+      font-weight: bold;
+    }
+
+    button {
+      margin: 2px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="page">
+    <header>
+      <div id="title">
+        <img src="images/barco1.png" alt="ícone de barco" />
+        <div class="headtitle">
+          <h1>Luxo</h1>
+          <h2>Aluguel de iates</h2>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <h2>Mensagens recebidas</h2>
+
+      <table id="tabela-mensagens">
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Email</th>
+            <th>Mensagem</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+        </tbody>
+      </table>
+    </main>
+  </div>
+
+  <footer>
+    <p>© 2023 por Luxo aluguel de iates</p>
+  </footer>
+
+  <script src="js/jquery-3.6.4.min.js"></script>
+  <script src="js/api.js"></script>
+
+  <script>
+    var mensagens = [];
+
+    // carrega mensagens da API e salva localmente
+    function carregarMensagens() {
+      // pega da API
+      mensagens = obterMensagens() || [];
+
+      // guarda no localStorage
+      localStorage.setItem("mensagens", JSON.stringify(mensagens));
+
+      // monta a tabela
+      montarTabela();
+    }
+
+    // monta a tabela toda vez que algo muda
+    function montarTabela() {
+      var tbody = document.querySelector("#tabela-mensagens tbody");
+      tbody.innerHTML = "";
+
+      // pega quais índices já foram marcados como visualizados
+      var visualizadas = JSON.parse(localStorage.getItem("visualizadas")) || [];
+
+      mensagens.forEach(function(msg, index) {
+        var tr = document.createElement("tr");
+
+        // se ainda não foi visualizada → linha em negrito
+        if (!visualizadas.includes(index)) {
+          tr.classList.add("nao-visualizada");
+        }
+
+        // células de texto
+        var tdNome = document.createElement("td");
+        tdNome.textContent = msg.nome;
+
+        var tdEmail = document.createElement("td");
+        tdEmail.textContent = msg.email;
+
+        var tdMsg = document.createElement("td");
+        tdMsg.textContent = msg.mensagem;
+
+        // célula de ações
+        var tdAcoes = document.createElement("td");
+
+        var btnVisualizar = document.createElement("button");
+        btnVisualizar.textContent = "Mensagem Visualizada";
+        btnVisualizar.onclick = function() {
+          marcarVisualizada(index);
+        };
+
+        var btnExcluir = document.createElement("button");
+        btnExcluir.textContent = "Excluir Mensagem";
+        btnExcluir.onclick = function() {
+          excluirMensagem(index);
+        };
+
+        tdAcoes.appendChild(btnVisualizar);
+        tdAcoes.appendChild(btnExcluir);
+
+        tr.appendChild(tdNome);
+        tr.appendChild(tdEmail);
+        tr.appendChild(tdMsg);
+        tr.appendChild(tdAcoes);
+
+        tbody.appendChild(tr);
+      });
+    }
+
+    // marca como visualizada (tira o negrito)
+    function marcarVisualizada(index) {
+      if (!confirm("Deseja marcar essa mensagem como visualizada?")) return;
+
+      var visualizadas = JSON.parse(localStorage.getItem("visualizadas")) || [];
+
+      if (!visualizadas.includes(index)) {
+        visualizadas.push(index);
+        localStorage.setItem("visualizadas", JSON.stringify(visualizadas));
+      }
+
+      montarTabela();
+    }
+
+    // exclui uma mensagem da lista
+    function excluirMensagem(index) {
+      if (!confirm("Tem certeza que deseja excluir essa mensagem?")) return;
+
+      // remove do array
+      mensagens.splice(index, 1);
+      localStorage.setItem("mensagens", JSON.stringify(mensagens));
+
+      // também ajusta a lista de visualizadas
+      var visualizadas = JSON.parse(localStorage.getItem("visualizadas")) || [];
+      visualizadas = visualizadas
+        .filter(function(i) { return i !== index; })        // tira o índice removido
+        .map(function(i) { return i > index ? i - 1 : i }); // ajusta os maiores
+
+      localStorage.setItem("visualizadas", JSON.stringify(visualizadas));
+
+      montarTabela();
+    }
+
+    // quando a página carregar, já busca as mensagens
+    window.onload = carregarMensagens;
+  </script>
+
+</body>
+</html>
